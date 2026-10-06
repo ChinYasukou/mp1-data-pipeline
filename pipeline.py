@@ -4,8 +4,8 @@ Data Processing Pipeline - CLI Template
 DS 3500 - MP1
 
 Usage:
-    python pipeline.py --input data.csv --config config.yaml --output clean.csv
-    python pipeline.py --input data.csv --config config.yaml --output clean.csv --verbose
+    python pipeline.py --input data.csv --config config/config.yaml --output output/clean.csv
+    python pipeline.py --input data.csv --config config/config.yaml --output output/clean.csv --verbose
 """
 
 import argparse
@@ -16,7 +16,9 @@ from src import (
     create_cleaning_report,
     load_data,
     process_data,
+    save_data,
     setup_logging,
+    validate_dataframe,
     validate_input,
 )
 
@@ -74,22 +76,41 @@ def main():
     except ValueError:
         sys.exit(1)
 
-    data_before = data.copy()
+    validation = config["validation"]
+    rows_before_validation = len(data)
     try:
-        cleaned_data = process_data(data, config)
+        validated_data = validate_dataframe(
+            data,
+            required_columns=validation["required_columns"],
+            numeric_columns=validation["numeric_columns"],
+        )
+    except ValueError:
+        sys.exit(1)
+
+    logger.info(
+        "Validation complete: %d → %d rows",
+        rows_before_validation,
+        len(validated_data),
+    )
+
+    data_before = validated_data.copy()
+    try:
+        cleaned_data = process_data(validated_data, config)
     except ValueError:
         sys.exit(1)
 
     report = create_cleaning_report(data_before, cleaned_data)
-    print(report)
     logger.info(
         "Processing complete: %d → %d rows",
         report["rows_before"],
         report["rows_after"],
     )
 
-    cleaned_data.to_csv(args.output, index=False)
-    logger.info("Saved cleaned data to %s", args.output)
+    output_path = save_data(cleaned_data, args.output)
+    logger.info("Saved cleaned data to %s", output_path)
+
+    print("\nCleaning report:")
+    print(report)
 
 
 if __name__ == "__main__":
