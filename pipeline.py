@@ -13,8 +13,7 @@ import logging
 import sys
 from pathlib import Path
 
-from data_loaders import load_data
-from data_processor import create_cleaning_report, process_data
+from src import create_cleaning_report, load_data, process_data
 
 
 logger = logging.getLogger(__name__)
