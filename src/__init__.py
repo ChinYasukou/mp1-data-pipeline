@@ -2,6 +2,13 @@
 
 from .data_loaders import load_data
 from .data_processor import create_cleaning_report, process_data
+from .utils import setup_logging, validate_input
 
 
-__all__ = ["create_cleaning_report", "load_data", "process_data"]
+__all__ = [
+    "create_cleaning_report",
+    "load_data",
+    "process_data",
+    "setup_logging",
+    "validate_input",
+]

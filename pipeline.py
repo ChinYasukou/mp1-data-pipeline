@@ -11,23 +11,17 @@ Usage:
 import argparse
 import logging
 import sys
-from pathlib import Path
 
-from src import create_cleaning_report, load_data, process_data
+from src import (
+    create_cleaning_report,
+    load_data,
+    process_data,
+    setup_logging,
+    validate_input,
+)
 
 
 logger = logging.getLogger(__name__)
-
-
-def setup_logging(verbose=False):
-    """Configure logging for the pipeline."""
-    level = logging.DEBUG if verbose else logging.INFO
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s %(levelname)-8s %(name)s — %(message)s",
-        datefmt="%H:%M:%S",
-        force=True,
-    )
 
 
 def parse_arguments():
@@ -56,16 +50,6 @@ def parse_arguments():
         help="Enable verbose logging",
     )
     return parser.parse_args()
-
-
-def validate_input(filepath):
-    """Check whether the input path exists and is a file."""
-    if Path(filepath).is_file():
-        logger.info(f"Input file validated: {filepath}")
-        return True
-
-    logger.error(f"Input file not found: {filepath}")
-    return False
 
 
 def main():
